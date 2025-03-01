@@ -1,5 +1,3 @@
-local tiempo = 800
-
 local function isMovementKeyPressed()
     return IsControlPressed(0, 32) or  -- W
            IsControlPressed(0, 34) or  -- A
@@ -32,37 +30,35 @@ end)
 Citizen.CreateThread(function()
     while true do
         Citizen.Wait(1)
-        tiempo = 800
-        
-        local ped = PlayerPedId()
-        local pco = GetEntityCoords(ped)
-        local closestVehicle = nil
-        local closestDist = 5.0
-
-        for _, vehicle in ipairs(GetGamePool("CVehicle")) do
-            local vehCoords = GetEntityCoords(vehicle)
-            local dist = #(pco - vehCoords)
-
-            if dist < closestDist then
-                closestDist = dist
-                closestVehicle = vehicle
+        if IsControlJustReleased(1, Config.KeyBind) then 
+            local ped = PlayerPedId()
+            local pco = GetEntityCoords(ped)
+            local closestVehicle = nil
+            local closestDist = 5.0
+            for _, vehicle in ipairs(GetGamePool("CVehicle")) do
+                local vehCoords = GetEntityCoords(vehicle)
+                local dist = #(pco - vehCoords)
+    
+                if dist < closestDist then
+                    closestDist = dist
+                    closestVehicle = vehicle
+                end
             end
-        end
 
+            if closestVehicle then
+                local vehicleNetId = NetworkGetNetworkIdFromEntity(closestVehicle)
+                local vehicleModel = GetEntityModel(closestVehicle)
+                local modelName = GetDisplayNameFromVehicleModel(vehicleModel)
+                local seats = GetVehicleModelNumberOfSeats(vehicleModel)
+                local vehicleClass = GetVehicleClass(closestVehicle)
 
-        if closestVehicle and IsControlJustReleased(1, Config.KeyBind) then 
-            local vehicleNetId = NetworkGetNetworkIdFromEntity(closestVehicle)
-            local vehicleModel = GetEntityModel(closestVehicle)
-            local modelName = GetDisplayNameFromVehicleModel(vehicleModel)
-            local seats = GetVehicleModelNumberOfSeats(vehicleModel)
-            local vehicleClass = GetVehicleClass(closestVehicle)
-
-            SendNUIMessage({
-                action = "openUI",
-                seats = seats,
-                vehicle = vehicleNetId
-            })
-            SetNuiFocus(true, true)
+                SendNUIMessage({
+                    action = "openUI",
+                    seats = seats,
+                    vehicle = vehicleNetId
+                })
+                SetNuiFocus(true, true)
+            end
         end    
     end
 end)
