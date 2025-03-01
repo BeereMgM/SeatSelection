@@ -1,3 +1,3 @@
 Config = {}
 
-Config.KeyBind = 47 -- G Key
+Config.KeyBind = "G" -- G Key

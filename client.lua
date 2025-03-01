@@ -27,41 +27,45 @@ RegisterNUICallback("closeUI", function(data, cb)
 end)
 
 
-Citizen.CreateThread(function()
-    while true do
-        Citizen.Wait(1)
-        if IsControlJustReleased(1, Config.KeyBind) then 
-            local ped = PlayerPedId()
-            local pco = GetEntityCoords(ped)
-            local closestVehicle = nil
-            local closestDist = 5.0
-            for _, vehicle in ipairs(GetGamePool("CVehicle")) do
-                local vehCoords = GetEntityCoords(vehicle)
-                local dist = #(pco - vehCoords)
-    
-                if dist < closestDist then
-                    closestDist = dist
-                    closestVehicle = vehicle
-                end
-            end
 
-            if closestVehicle then
-                local vehicleNetId = NetworkGetNetworkIdFromEntity(closestVehicle)
-                local vehicleModel = GetEntityModel(closestVehicle)
-                local modelName = GetDisplayNameFromVehicleModel(vehicleModel)
-                local seats = GetVehicleModelNumberOfSeats(vehicleModel)
-                local vehicleClass = GetVehicleClass(closestVehicle)
+RegisterKeyMapping('+nuihotkey', 'Open Seatselection', 'keyboard', Config.KeyBind)
 
-                SendNUIMessage({
-                    action = "openUI",
-                    seats = seats,
-                    vehicle = vehicleNetId
-                })
-                SetNuiFocus(true, true)
-            end
-        end    
+RegisterCommand('+nuihotkey', function()
+    local ped = PlayerPedId()
+    local pco = GetEntityCoords(ped)
+    local closestVehicle = nil
+    local closestDist = 5.0
+    for _, vehicle in ipairs(GetGamePool("CVehicle")) do
+        local vehCoords = GetEntityCoords(vehicle)
+        local dist = #(pco - vehCoords)
+
+        if dist < closestDist then
+            closestDist = dist
+            closestVehicle = vehicle
+        end
     end
+
+    if closestVehicle then
+        local vehicleNetId = NetworkGetNetworkIdFromEntity(closestVehicle)
+        local vehicleModel = GetEntityModel(closestVehicle)
+        local modelName = GetDisplayNameFromVehicleModel(vehicleModel)
+        local seats = GetVehicleModelNumberOfSeats(vehicleModel)
+        local vehicleClass = GetVehicleClass(closestVehicle)
+
+        SendNUIMessage({
+            action = "openUI",
+            seats = seats,
+            vehicle = vehicleNetId
+        })
+        SetNuiFocus(true, true)
+    end  
 end)
+
+
+
+
+            
+
 
 RegisterNetEvent('car_door:goIntoVehicle')
 AddEventHandler('car_door:goIntoVehicle', function(seat, vehicle)
@@ -96,7 +100,7 @@ AddEventHandler('car_door:goIntoVehicle', function(seat, vehicle)
                 TaskGoToCoordAnyMeans(ped, doorPos.x, doorPos.y, doorPos.z+0.3, 1.0, 0, 0, 32, 0)
                 local walking = true
                 while walking == true do
-                    Citizen.Wait(10)
+                    Citizen.Wait(500)
                     local playerCoords = GetEntityCoords(ped)
                     local distance = GetDistanceBetweenCoords(doorPos.x, doorPos.y, doorPos.z+0.3, playerCoords.x, playerCoords.y, playerCoords.z, false)
                     if distance <= 1 then
