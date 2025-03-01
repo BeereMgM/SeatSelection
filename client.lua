@@ -62,6 +62,10 @@ RegisterCommand('+nuihotkey', function()
 end)
 
 
+RegisterCommand('-nuihotkey', function()
+    
+end, false)
+
 
 
             
