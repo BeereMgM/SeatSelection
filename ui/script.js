@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 seatDiv.classList.add("seat");
                 seatDiv.textContent = i;
                 seatDiv.onclick = () => {
-                    fetch(`https://car_door/selectSeat`, {
+                    fetch(`https://${GetParentResourceName()}/selectSeat`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ seat: i, vehicle: event.data.vehicle })
@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape") {
-            fetch(`https://car_door/closeUI`, {
+            fetch(`https://${GetParentResourceName()}/closeUI`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }
             });
